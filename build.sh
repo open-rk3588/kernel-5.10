@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -e
+JOB=`sed -n "N;/processor/p" /proc/cpuinfo|wc -l`
+
+CROSS_COMPILE_ARM64=aarch64-none-linux-gnu-
+
+export KERNEL_TARGET=moff
+#export RK_KERNEL_DTB=rk-kernel.dtb
+RK_KERNEL_DEFCONFIG_FRAGMENT=
+
+# kernel
+make ARCH=arm64 CROSS_COMPILE=$CROSS_COMPILE_ARM64 ${KERNEL_TARGET}_defconfig $RK_KERNEL_DEFCONFIG_FRAGMENT
+make ARCH=arm64 CROSS_COMPILE=$CROSS_COMPILE_ARM64 -j$JOB
+make ARCH=arm64 CROSS_COMPILE=$CROSS_COMPILE_ARM64 dtbs -j$JOB
+#make ARCH=arm64 CROSS_COMPILE=$CROSS_COMPILE_ARM64 ${KERNEL_TARGET}.img
+
+./pack.sh
